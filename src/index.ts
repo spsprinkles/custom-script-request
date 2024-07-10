@@ -47,7 +47,8 @@ const GlobalVariable = {
                 });
             }
         );
-    }
+    },
+    updateTheme: (themeInfo) => { ThemeManager.update(themeInfo); }
 };
 
 // Make is available in the DOM

@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "18.19.0",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.12.0"
+    },
+    "version": "1.18.2",
+    "libraryName": "custom-script-request",
+    "libraryId": "95104e3d-2e45-4b06-afbc-0b05eb8db489",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "CustomScriptRequest",
+    "solutionShortDescription": "CustomScriptRequest description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

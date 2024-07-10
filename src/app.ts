@@ -1,5 +1,5 @@
 import { Dashboard, LoadingDialog, Modal } from "dattatable";
-import { Components, Web } from "gd-sprest-bs";
+import { Components, ContextInfo, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import * as moment from "moment";
 import { DataSource, IListItem } from "./ds";
@@ -75,7 +75,7 @@ export class App {
                         jQuery('th', thead).addClass('align-middle');
                     },
                     // Order by the 1st column by default; ascending
-                    order: [[1, "asc"]]
+                    order: [[0, "desc"]]
                 },
                 columns: [
                     {
@@ -91,6 +91,23 @@ export class App {
                         title: "Site Url"
                     },
                     {
+                        name: "",
+                        title: "Owners",
+                        onRenderCell: (el, column, item: IListItem) => {
+                            let owners = [];
+
+                            // Parse the users
+                            let users = item.Owners?.results || [];
+                            for (let i = 0; i < users.length; i++) {
+                                // Append the name
+                                owners.push(users[i].Title);
+                            }
+
+                            // Render the owners
+                            el.innerHTML = owners.join("\n<br/>\n");
+                        }
+                    },
+                    {
                         name: "Status",
                         title: "Status"
                     },
@@ -98,11 +115,27 @@ export class App {
                         name: "Actions",
                         title: "",
                         onRenderCell: (el, column, item: IListItem) => {
-                            // See if this is the creator of the item or an admin
-                            // TODO
-
-                            // Show delete dialog
-                            this.showDeleteDialog(item);
+                            // See if this request hasn't been processed
+                            if (item.Status == "New") {
+                                // See if this is the creator of the item or an admin
+                                if (item.AuthorId == ContextInfo.userId) {
+                                    // Render the action buttons
+                                    Components.ButtonGroup({
+                                        el,
+                                        isSmall: true,
+                                        buttons: [
+                                            {
+                                                text: "Delete",
+                                                type: Components.ButtonTypes.OutlineDanger,
+                                                onClick: () => {
+                                                    // Show delete dialog
+                                                    this.showDeleteDialog(item);
+                                                }
+                                            }
+                                        ]
+                                    });
+                                }
+                            }
                         }
                     }
                 ]
@@ -125,7 +158,7 @@ export class App {
             text: "Delete",
             onClick: () => {
                 // Show a loading dialog
-                LoadingDialog.setHeader("Deleteing Item");
+                LoadingDialog.setHeader("Deleting Request");
                 LoadingDialog.setBody("This will close after the request is removed...");
                 LoadingDialog.show();
 

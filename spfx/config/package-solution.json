@@ -1,0 +1,41 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "Custom Script Request",
+    "id": "95104e3d-2e45-4b06-afbc-0b05eb8db489",
+    "version": "0.0.0.1",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "iconPath": "images/AppIcon.png",
+    "developer": {
+      "name": "Gunjan Datta",
+      "websiteUrl": "https://github.com/spsprinkles/custom-script-request",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.18.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "Dashboard to handle requests for the custom scripts to be enabled on their SPO site collection."
+      },
+      "longDescription": {
+        "default": "Dashboard to handle requests for the custom scripts to be enabled on their SPO site collection."
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "custom-script-request Feature",
+        "description": "The feature that activates elements of the custom-script-request solution.",
+        "id": "3b39be80-a8c7-43c8-8a4f-3fa171dff4d0",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "../../dist/custom-script-request.sppkg"
+  }
+}

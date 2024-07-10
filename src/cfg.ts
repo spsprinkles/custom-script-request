@@ -14,6 +14,14 @@ export const Configuration = Helper.SPConfig({
             TitleFieldDisplayName: "Site Url",
             CustomFields: [
                 {
+                    name: "Owners",
+                    title: "Owners",
+                    type: Helper.SPCfgFieldType.User,
+                    multi: true,
+                    selectionMode: SPTypes.FieldUserSelectionType.PeopleOnly,
+                    required: true
+                } as Helper.IFieldInfoUser,
+                {
                     name: "Status",
                     title: "Status",
                     type: Helper.SPCfgFieldType.Choice,
@@ -23,7 +31,7 @@ export const Configuration = Helper.SPConfig({
                     showInNewForm: false,
                     showInEditForm: false,
                     choices: [
-                        "New", "Error", "Completed"
+                        "New", "Error", "Processed", "Completed"
                     ]
                 } as Helper.IFieldInfoChoice
             ],
@@ -31,7 +39,7 @@ export const Configuration = Helper.SPConfig({
                 {
                     ViewName: "All Items",
                     ViewFields: [
-                        "LinkTitle", "Status", "Created"
+                        "LinkTitle", "Created", "Status", "Owners"
                     ]
                 }
             ]

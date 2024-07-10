@@ -7,6 +7,9 @@ import Strings from "./strings";
  * Add your custom fields here
  */
 export interface IListItem extends Types.SP.ListItem {
+    AuthorId: number;
+    Owners: { results: { Title: string, Id: number; }[] }
+    OwnersId: number[];
     Status: string;
 }
 
@@ -67,9 +70,11 @@ export class DataSource {
             this._list = new List<IListItem>({
                 listName: Strings.Lists.Main,
                 itemQuery: {
-                    GetAllItems: true,
+                    Expand: ["Owners"],
                     OrderBy: ["Title"],
-                    Top: 5000
+                    GetAllItems: true,
+                    Top: 5000,
+                    Select: ["*", "Owners/Id", "Owners/Title"]
                 },
                 onInitError: reject,
                 onInitialized: () => {

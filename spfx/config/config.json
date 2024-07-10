@@ -1,0 +1,23 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "custom-script-request-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/customScriptRequest/CustomScriptRequestWebPart.js",
+          "manifest": "./src/webparts/customScriptRequest/CustomScriptRequestWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {
+    "main-lib": {
+      "globalName": "main-lib",
+      "path": "../dist/custom-script-request.js"
+    }
+  },
+  "localizedResources": {
+    "CustomScriptRequestWebPartStrings": "lib/webparts/customScriptRequest/loc/{locale}.js"
+  }
+}
