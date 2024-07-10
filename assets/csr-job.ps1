@@ -69,7 +69,7 @@ $items = Get-PnPListItem -List $listName -Query $query -PageSize 1000 -ScriptBlo
     Set-PnPSite -Url $siteUrl -DenyAddAndCustomizePages $true;
 
     # Update the item status
-    Set-PnpListItem -List $listName -Identity $item.Id -Values @{ "Status" = "Completed" };
+    Set-PnpListItem -List $listName -Identity $item.Id -Values @{ "Status" = "Processed" };
 
     # Host
     Write-Host "Completed...";
