@@ -201,11 +201,28 @@ export class App {
                                 // Web exists, update the site url to be absolute
                                 values["Title"] = web.Url;
 
-                                // Hide the dialog
-                                LoadingDialog.hide();
+                                web.SiteUsers().getByEmail(ContextInfo.userEmail).execute(user => {
+                                    // Ensure this is an SCA
+                                    if (user.IsSiteAdmin) {
+                                        // Hide the dialog
+                                        LoadingDialog.hide();
 
-                                // Resolve the request
-                                resolve(true);
+                                        // Resolve the request
+                                        resolve(true);
+                                    } else {
+                                        // Site doesn't exist
+                                        ctrlSiteUrl.updateValidation(ctrlSiteUrl.el, {
+                                            isValid: false,
+                                            invalidMessage: "Site exists, but you are not the administrator. Please have the site administrator submit the request."
+                                        });
+
+                                        // Hide the loading dialog
+                                        LoadingDialog.hide();
+
+                                        // Resolve the request
+                                        resolve(false);
+                                    }
+                                })
                             },
 
                             (ex) => {

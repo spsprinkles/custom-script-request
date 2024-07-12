@@ -66,7 +66,7 @@ $items = Get-PnPListItem -List $listName -Query $query -PageSize 1000 -ScriptBlo
     Write-Host "Processing site $siteUrl";
 
     # Enable the setting
-    Set-PnPSite -Url $siteUrl -DenyAddAndCustomizePages $true;
+    Set-PnPSite -Identity $siteUrl -NoScriptSite $false;
 
     # Update the item status
     Set-PnpListItem -List $listName -Identity $item.Id -Values @{ "Status" = "Processed" };
