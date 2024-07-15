@@ -180,11 +180,19 @@ export class App {
 
                 // Delete the item
                 item.delete().execute(() => {
-                    // Hide the dialog
-                    LoadingDialog.hide();
+                    // Refresh the data
+                    DataSource.refresh().then(() => {
+                        // Refresh the dashboard
+                        this._dashboard.refresh(DataSource.ListItems);
+
+                        // Hide the dialogs
+                        LoadingDialog.hide();
+                        Modal.hide();
+                    });
                 }, () => {
-                    // Hide the dialog
+                    // Hide the dialogs
                     LoadingDialog.hide();
+                    Modal.hide();
                 });
             }
         });
