@@ -17,6 +17,22 @@ export class App {
         this.render(el);
     }
 
+    // Returns true/false if the user is an owner of the item
+    private isOwner(item: IListItem) {
+        // See if they created the request
+        if (item.AuthorId == ContextInfo.userId) { return true; }
+
+        // Parse the owners
+        let ownerIDs = item.OwnersId?.results || [];
+        for (let i = 0; i < ownerIDs.length; i++) {
+            // See if they are an owner
+            if (ownerIDs[i] == ContextInfo.userId) { return true; }
+        }
+
+        // Not the owner of the item
+        return false;
+    }
+
     // Renders the dashboard
     private render(el: HTMLElement) {
         // Create the dashboard
@@ -118,7 +134,7 @@ export class App {
                             // See if this request hasn't been processed
                             if (item.Status == "New") {
                                 // See if this is the creator of the item or an admin
-                                if (item.AuthorId == ContextInfo.userId) {
+                                if (this.isOwner(item)) {
                                     // Render the action buttons
                                     Components.ButtonGroup({
                                         el,
@@ -169,8 +185,6 @@ export class App {
                 }, () => {
                     // Hide the dialog
                     LoadingDialog.hide();
-
-                    // Show an error dialog
                 });
             }
         });
