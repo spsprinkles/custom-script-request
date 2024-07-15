@@ -8,8 +8,8 @@ import Strings from "./strings";
  */
 export interface IListItem extends Types.SP.ListItem {
     AuthorId: number;
-    Owners: { results: { Title: string, Id: number; }[] }
-    OwnersId: number[];
+    Owners: { results: { Title: string; Id: number; }[] }
+    OwnersId: { results: number[]; }
     Status: string;
 }
 
