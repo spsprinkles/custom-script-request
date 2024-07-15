@@ -205,6 +205,18 @@ export class App {
     private showNewForm() {
         // Show the new form
         DataSource.List.newForm({
+            onCreateEditForm: props => {
+                props.onControlRendering = (ctrl, fld) => {
+                    // See if this is the owners field
+                    if (fld.InternalName == "Owners") {
+                        // Default the owners to the current user
+                        ctrl.value = [ContextInfo.userId];
+                    }
+                }
+
+                // Return the properties
+                return props;
+            },
             onValidation: (values, isValid) => {
                 // See if the form values have been set
                 if (isValid) {
