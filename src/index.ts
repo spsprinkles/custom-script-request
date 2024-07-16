@@ -3,6 +3,8 @@ import { InstallationRequired } from "dattatable";
 import { App } from "./app";
 import { Configuration } from "./cfg";
 import { DataSource } from "./ds";
+import { InstallationModal } from "./install";
+import { Security } from "./security";
 import Strings, { setContext } from "./strings";
 
 // Styling
@@ -34,15 +36,12 @@ const GlobalVariable = {
 
             // Error
             () => {
-                // See if an installation is required
-                InstallationRequired.requiresInstall({ cfg: Configuration }).then(installFl => {
-                    // See if an install is required
-                    if (installFl) {
-                        // Show the dialog
-                        InstallationRequired.showDialog();
-                    } else {
-                        // Log
-                        console.error("[" + Strings.ProjectName + "] Error initializing the solution.");
+                // See if the user has the correct permissions
+                Security.hasPermissions().then(hasPermissions => {
+                    // See if the user has permissions
+                    if (hasPermissions) {
+                        // Show the installation modal
+                        InstallationModal.show();
                     }
                 });
             }
