@@ -3,6 +3,8 @@ import { Components, ContextInfo, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import * as moment from "moment";
 import { DataSource, IListItem } from "./ds";
+import { InstallationModal } from "./install";
+import { Security } from "./security";
 import Strings from "./strings";
 
 /**
@@ -62,7 +64,30 @@ export class App {
                             this.showNewForm();
                         }
                     }
-                ]
+                ],
+                itemsEnd: Security.IsAdmin ? [
+                    {
+                        className: "btn-outline-light",
+                        text: "Settings",
+                        isButton: true,
+                        items: [
+                            {
+                                text: "Application Configuration",
+                                onClick: () => {
+                                    // Show the install modal
+                                    InstallationModal.show(true);
+                                }
+                            },
+                            {
+                                text: "List Settings",
+                                onClick: () => {
+                                    // Show the list settings of the main list
+                                    window.open(DataSource.List.ListSettingsUrl, "_blank");
+                                }
+                            }
+                        ]
+                    }
+                ] : null
             },
             footer: {
                 itemsEnd: [

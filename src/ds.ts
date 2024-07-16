@@ -1,5 +1,6 @@
 import { List } from "dattatable";
-import { Components, Types, Web } from "gd-sprest-bs";
+import { Components, Types } from "gd-sprest-bs";
+import { Security } from "./security";
 import Strings from "./strings";
 
 /**
@@ -17,12 +18,36 @@ export interface IListItem extends Types.SP.ListItem {
  * Data Source
  */
 export class DataSource {
+    // List Items
+    static get ListItems(): IListItem[] { return this.List.Items; }
+
     // List
     private static _list: List<IListItem> = null;
     static get List(): List<IListItem> { return this._list; }
+    private static loadList(): PromiseLike<void> {
+        // Return a promise
+        return new Promise((resolve, reject) => {
+            // Initialize the list
+            this._list = new List<IListItem>({
+                listName: Strings.Lists.Main,
+                itemQuery: {
+                    Expand: ["Owners"],
+                    OrderBy: ["Title"],
+                    GetAllItems: true,
+                    Top: 5000,
+                    Select: ["*", "Owners/Id", "Owners/Title"]
+                },
+                onInitError: reject,
+                onInitialized: () => {
+                    // Load the status filters
+                    this.loadStatusFilters();
 
-    // List Items
-    static get ListItems(): IListItem[] { return this.List.Items; }
+                    // Resolve the request
+                    resolve();
+                }
+            });
+        });
+    }
 
     // Status Filters
     private static _statusFilters: Components.ICheckboxGroupItem[] = null;
@@ -63,29 +88,14 @@ export class DataSource {
     }
 
     // Initializes the application
-    static init(): PromiseLike<void> {
+    static init(): PromiseLike<any> {
         // Return a promise
-        return new Promise((resolve, reject) => {
-            // Initialize the list
-            this._list = new List<IListItem>({
-                listName: Strings.Lists.Main,
-                itemQuery: {
-                    Expand: ["Owners"],
-                    OrderBy: ["Title"],
-                    GetAllItems: true,
-                    Top: 5000,
-                    Select: ["*", "Owners/Id", "Owners/Title"]
-                },
-                onInitError: reject,
-                onInitialized: () => {
-                    // Load the status filters
-                    this.loadStatusFilters();
-
-                    // Resolve the request
-                    resolve();
-                }
-            });
-        });
+        return Promise.all([
+            // Init the security
+            Security.init(),
+            // Load the list
+            this.loadList()
+        ]);
     }
 
     // Refreshes the list data
