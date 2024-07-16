@@ -67,7 +67,7 @@ export class App {
                 ],
                 itemsEnd: Security.IsAdmin ? [
                     {
-                        className: "btn-outline-light",
+                        className: "btn-outline-light me-2",
                         text: "Settings",
                         isButton: true,
                         items: [
