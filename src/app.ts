@@ -15,6 +15,9 @@ export class App {
 
     // Constructor
     constructor(el: HTMLElement) {
+        // Clear the element
+        while (el.firstChild) { el.removeChild(el.firstChild); }
+
         // Render the dashboard
         this.render(el);
     }

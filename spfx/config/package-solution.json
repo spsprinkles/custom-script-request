@@ -3,7 +3,7 @@
   "solution": {
     "name": "Custom Script Request",
     "id": "95104e3d-2e45-4b06-afbc-0b05eb8db489",
-    "version": "0.0.0.5",
+    "version": "0.0.0.6",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,

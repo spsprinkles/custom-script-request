@@ -36,6 +36,8 @@ export default class CustomScriptRequestWebPart extends BaseClientSideWebPart<IC
     return Version.parse(this.context.manifest.version);
   }
 
+  protected get disableReactivePropertyChanges(): boolean { return true; }
+
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
       pages: [
