@@ -9,8 +9,7 @@ import Strings from "./strings";
  */
 export interface IListItem extends Types.SP.ListItem {
     AuthorId: number;
-    Owners: { results: { Title: string; Id: number; }[] }
-    OwnersId: { results: number[]; }
+    Author: { Id: number; Title: string; }
     Status: string;
 }
 
@@ -63,7 +62,7 @@ export class DataSource {
             let Filter = null;
             if (!Security.IsAdmin) {
                 // Set the filter
-                Filter = "Owners/Id eq " + ContextInfo.userId + " or AuthorId eq " + ContextInfo.userId;
+                Filter = "AuthorId eq " + ContextInfo.userId;
             }
 
             // Initialize the list
@@ -71,11 +70,11 @@ export class DataSource {
                 listName: Strings.Lists.Main,
                 itemQuery: {
                     Filter,
-                    Expand: ["Owners"],
+                    Expand: ["Author"],
                     OrderBy: ["Title"],
                     GetAllItems: true,
                     Top: 5000,
-                    Select: ["*", "Owners/Id", "Owners/Title"]
+                    Select: ["*", "Author/Id", "Author/Title"]
                 },
                 onInitError: reject,
                 onInitialized: () => {

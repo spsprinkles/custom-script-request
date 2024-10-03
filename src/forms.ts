@@ -7,6 +7,9 @@ import { DataSource, IListItem } from "./ds";
 export class Forms {
     // Shows the delete dialog
     static deleteForm(item: IListItem, onDelete: () => void) {
+        // Clear the modal
+        Modal.clear();
+
         // Set the header
         Modal.setHeader("Delete Request");
 
@@ -137,30 +140,33 @@ export class Forms {
                 return isValid;
             },
             onUpdate: (item: IListItem) => {
-                // See if the azure function is enabled
-                if (DataSource.AzureFunctionEnabled) {
-                    // Process the request
-                    this.processRequest(item.Id);
-                } else {
-                    // Refresh the data
-                    DataSource.refresh(item.Id).then(() => {
+                // Refresh the data
+                DataSource.refresh(item.Id).then(() => {
+                    // See if the azure function is enabled
+                    if (DataSource.AzureFunctionEnabled) {
+                        // Process the request
+                        this.processRequest(item.Id).then(() => {
+                            // Call the update event
+                            onUpdate();
+                        });
+                    } else {
                         // Call the update event
                         onUpdate();
-                    });
-                }
+                    }
+                });
             }
         });
     }
 
     // Method to process a request
     static processRequest(itemId: number): PromiseLike<void> {
-        // Show a loading dialog
-        LoadingDialog.setHeader("Processing Request");
-        LoadingDialog.setBody("The request is being processed...");
-        LoadingDialog.show();
-
         // Return a promise
         return new Promise((resolve) => {
+            // Show a loading dialog
+            LoadingDialog.setHeader("Processing Request");
+            LoadingDialog.setBody("The request is being processed...");
+            LoadingDialog.show();
+
             // Process the request
             DataSource.processRequest(itemId).then(
                 // Success
@@ -195,17 +201,14 @@ export class Forms {
                     // Set the body
                     Modal.setBody(msg);
 
-                    // Refresh the item
-                    DataSource.refresh(itemId).then(() => {
-                        // Hide the loading dialog
-                        LoadingDialog.hide();
+                    // Show the modal
+                    Modal.show();
 
-                        // Show the modal
-                        Modal.show();
+                    // Hide the loading dialog
+                    LoadingDialog.hide();
 
-                        // Resolve the request
-                        resolve();
-                    });
+                    // Resolve the request
+                    resolve();
                 }
             );
         });

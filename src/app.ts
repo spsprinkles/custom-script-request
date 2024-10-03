@@ -25,17 +25,7 @@ export class App {
     // Returns true/false if the user is an owner of the item
     private isOwner(item: IListItem) {
         // See if they created the request
-        if (item.AuthorId == ContextInfo.userId) { return true; }
-
-        // Parse the owners
-        let ownerIDs = item.OwnersId?.results || [];
-        for (let i = 0; i < ownerIDs.length; i++) {
-            // See if they are an owner
-            if (ownerIDs[i] == ContextInfo.userId) { return true; }
-        }
-
-        // Not the owner of the item
-        return false;
+        return item.AuthorId == ContextInfo.userId;
     }
 
     // Renders the dashboard
@@ -51,7 +41,7 @@ export class App {
                     items: DataSource.StatusFilters,
                     onFilter: (value: string) => {
                         // Filter the table
-                        this._dashboard.filter(3, value);
+                        this._dashboard.filter(2, value);
                     }
                 }]
             },
@@ -106,7 +96,7 @@ export class App {
                 rows: DataSource.ListItems,
                 onRendering: dtProps => {
                     // Default order
-                    dtProps.order = [[0, "asc"]];
+                    dtProps.order = [[0, "desc"]];
 
                     // Return the properties
                     return dtProps;
@@ -116,30 +106,28 @@ export class App {
                         name: "Created",
                         title: "Request Date",
                         onRenderCell: (el, column, item: IListItem) => {
+                            // Set the filter to only look at the time
+                            let filterValue = moment(item["Created"]).format("llll");
+                            el.setAttribute("data-filter", filterValue);
+
+                            // See if this is the admin
+                            if (Security.IsAdmin) {
+                                // Display the author
+                                el.innerHTML = `
+                                    <span>${item["Author"]}</span>
+                                    <br/>
+                                `;
+                            }
+
                             // Use moment to set the date/time
-                            el.innerHTML = moment(item["Created"]).format("llll");
+                            el.innerHTML += `
+                                <span>${filterValue}</span>
+                            `;
                         }
                     },
                     {
                         name: "Title",
                         title: "Site Url"
-                    },
-                    {
-                        name: "",
-                        title: "Owners",
-                        onRenderCell: (el, column, item: IListItem) => {
-                            let owners = [];
-
-                            // Parse the users
-                            let users = item.Owners?.results || [];
-                            for (let i = 0; i < users.length; i++) {
-                                // Append the name
-                                owners.push(users[i].Title);
-                            }
-
-                            // Render the owners
-                            el.innerHTML = owners.join("\n<br/>\n");
-                        }
                     },
                     {
                         name: "Status",
@@ -151,27 +139,21 @@ export class App {
                         onRenderCell: (el, column, item: IListItem) => {
                             let buttons: Components.IButtonProps[] = [];
 
-                            // See if this request hasn't been processed
-                            if (item.Status == "New") {
-                                // See if this is the creator of the item or an admin
-                                if (this.isOwner(item)) {
-                                    // Render the delete button
-                                    buttons.push({
-                                        text: "Delete",
-                                        type: Components.ButtonTypes.OutlineDanger,
-                                        onClick: () => {
-                                            // Show delete dialog
-                                            Forms.deleteForm(item, () => {
-                                                // Refresh the table
-                                                this._dashboard.refresh(DataSource.ListItems);
-                                            });
-                                        }
-                                    });
-                                }
-                            }
+                            // See if this request hasn't been processed and this is the owner
+                            if (item.Status == "New" && this.isOwner(item)) {
+                                // Render the delete button
+                                buttons.push({
+                                    text: "Delete",
+                                    type: Components.ButtonTypes.OutlineDanger,
+                                    onClick: () => {
+                                        // Show delete dialog
+                                        Forms.deleteForm(item, () => {
+                                            // Refresh the table
+                                            this._dashboard.refresh(DataSource.ListItems);
+                                        });
+                                    }
+                                });
 
-                            // See if the request errored and the azure function is enabled
-                            if (item.Status == "Error" && DataSource.AzureFunctionEnabled) {
                                 // Render the retry button
                                 buttons.push({
                                     text: "Retry",
@@ -198,5 +180,4 @@ export class App {
             }
         });
     }
-
 }
