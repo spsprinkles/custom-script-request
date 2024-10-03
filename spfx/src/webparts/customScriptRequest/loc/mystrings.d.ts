@@ -1,7 +1,7 @@
 declare interface ICustomScriptRequestWebPartStrings {
-  PropertyPaneDescription: string;
+  AzureFunctionUrlFieldDescription: string;
+  AzureFunctionUrlFieldLabel: string;
   BasicGroupName: string;
-  DescriptionFieldLabel: string;
   AppLocalEnvironmentSharePoint: string;
   AppLocalEnvironmentTeams: string;
   AppLocalEnvironmentOffice: string;

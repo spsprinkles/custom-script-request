@@ -20,7 +20,7 @@ const Strings = {
         Main: "Custom Script Requests"
     },
     ProjectName: "Custom Script Requester",
-    ProjectDescription: "A tool to trigger a flow to enable the custom script feature on a site collection.",
+    ProjectDescription: "Application for adminitrators to use to enable custom scripts for site collections.",
     SourceUrl: ContextInfo.webServerRelativeUrl,
     Version: "0.1"
 };

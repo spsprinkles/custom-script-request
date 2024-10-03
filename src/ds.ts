@@ -18,6 +18,38 @@ export interface IListItem extends Types.SP.ListItem {
  * Data Source
  */
 export class DataSource {
+    // Azure Function Url
+    private static _azureFunctionUrl: string = null;
+    static get AzureFunctionEnabled(): boolean { return this._azureFunctionUrl ? true : false; }
+    static processRequest(itemId: number): PromiseLike<string> {
+        // Return a promise
+        return new Promise((resolve, reject) => {
+            // Create the request
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", this._azureFunctionUrl, true);
+
+            // Set the header
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            // Set the event
+            xhr.onreadystatechange = (ev) => {
+                if (xhr.readyState !== 4) { return; }
+
+                // See if it was successful
+                if (xhr.status === 200) {
+                    // Resolve the request                
+                    resolve(xhr.responseText);
+                } else {
+                    // Reject the request
+                    reject(xhr.responseText);
+                }
+            }
+
+            // Send the request
+            xhr.send(JSON.stringify({ requestId: itemId }));
+        });
+    }
+
     // List Items
     static get ListItems(): IListItem[] { return this.List.Items; }
 
@@ -88,7 +120,10 @@ export class DataSource {
     }
 
     // Initializes the application
-    static init(): PromiseLike<any> {
+    static init(azureFunctionUrl: string): PromiseLike<any> {
+        // Set the url
+        this._azureFunctionUrl = azureFunctionUrl;
+
         // Return a promise
         return Promise.all([
             // Init the security

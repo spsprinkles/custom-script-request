@@ -1,5 +1,4 @@
 import { ContextInfo, ThemeManager } from "gd-sprest-bs";
-import { InstallationRequired } from "dattatable";
 import { App } from "./app";
 import { Configuration } from "./cfg";
 import { DataSource } from "./ds";
@@ -13,18 +12,19 @@ import "./styles.scss";
 // Create the global variable for this solution
 const GlobalVariable = {
     Configuration,
-    render: (el, context?, sourceUrl?: string) => {
+    appDescription: Strings.ProjectDescription,
+    render: (el, context?, azureFunctionUrl?: string) => {
         // See if the page context exists
         if (context) {
             // Set the context
-            setContext(context, sourceUrl);
+            setContext(context);
 
             // Update the configuration
-            Configuration.setWebUrl(sourceUrl || ContextInfo.webServerRelativeUrl);
+            Configuration.setWebUrl(ContextInfo.webServerRelativeUrl);
         }
 
         // Initialize the application
-        DataSource.init().then(
+        DataSource.init(azureFunctionUrl).then(
             // Success
             () => {
                 // Load the current theme and apply it to the components

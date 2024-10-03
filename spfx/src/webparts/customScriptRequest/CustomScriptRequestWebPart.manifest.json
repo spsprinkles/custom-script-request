@@ -30,7 +30,9 @@
         "default": "Dashboard to handle requests for the custom scripts to be enabled on their SPO site collection."
       },
       "officeFabricIconFontName": "Page",
-      "properties": {}
+      "properties": {
+        "azure_function_url": ""
+      }
     }
   ]
 }

@@ -15,10 +15,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "datatables.net": "^1.13.11",
-    "datatables.net-bs5": "^1.13.11",
-    "dattatable": "^2.10.14",
-    "gd-sprest-bs": "^10.11.57",
+    "datatables.net": "^2.1.7",
+    "datatables.net-bs5": "^2.1.7",
+    "dattatable": "^2.11.1",
+    "gd-sprest-bs": "^10.12.12",
     "jquery": "^3.7.1",
     "moment": "^2.30.1"
   },

@@ -35,6 +35,62 @@ export class App {
         return false;
     }
 
+    // Method to process a request
+    private processRequest(itemId: number) {
+        // Show a loading dialog
+        LoadingDialog.setHeader("Processing Request");
+        LoadingDialog.setBody("The request is being processed...");
+        LoadingDialog.show();
+
+        // Process the request
+        DataSource.processRequest(itemId).then(
+            // Success
+            (msg) => {
+                // Refresh the item
+                DataSource.refresh(itemId).then(() => {
+                    // Refresh the table
+                    this._dashboard.refresh(DataSource.ListItems);
+                });
+
+                // Clear the modal
+                Modal.clear();
+
+                // Set the header
+                Modal.setHeader("Request Processed");
+
+                // Set the body
+                Modal.setBody(msg);
+
+                // Show the modal
+                Modal.show();
+            },
+
+            // Error
+            msg => {
+                // Clear the modal
+                Modal.clear();
+
+                // Set the header
+                Modal.setHeader("Error Processing Request");
+
+                // Set the body
+                Modal.setBody(msg);
+
+                // Refresh the item
+                DataSource.refresh(itemId).then(() => {
+                    // Refresh the table
+                    this._dashboard.refresh(DataSource.ListItems);
+
+                    // Hide the loading dialog
+                    LoadingDialog.hide();
+
+                    // Show the modal
+                    Modal.show();
+                });
+            }
+        );
+    }
+
     // Renders the dashboard
     private render(el: HTMLElement) {
         // Create the dashboard
@@ -98,25 +154,12 @@ export class App {
             },
             table: {
                 rows: DataSource.ListItems,
-                dtProps: {
-                    dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
-                    createdRow: function (row, data, index) {
-                        jQuery('td', row).addClass('align-middle');
-                    },
-                    drawCallback: function (settings) {
-                        let api = new jQuery.fn.dataTable.Api(settings) as any;
-                        jQuery(api.context[0].nTable).removeClass('no-footer');
-                        jQuery(api.context[0].nTable).addClass('tbl-footer');
-                        jQuery(api.context[0].nTable).addClass('table-striped');
-                        jQuery(api.context[0].nTableWrapper).find('.dataTables_info').addClass('text-center');
-                        jQuery(api.context[0].nTableWrapper).find('.dataTables_length').addClass('pt-2');
-                        jQuery(api.context[0].nTableWrapper).find('.dataTables_paginate').addClass('pt-03');
-                    },
-                    headerCallback: function (thead, data, start, end, display) {
-                        jQuery('th', thead).addClass('align-middle');
-                    },
-                    // Order by the 1st column by default; ascending
-                    order: [[0, "desc"]]
+                onRendering: dtProps => {
+                    // Default order
+                    dtProps.order = [[0, "asc"]];
+
+                    // Return the properties
+                    return dtProps;
                 },
                 columns: [
                     {
@@ -156,27 +199,43 @@ export class App {
                         name: "Actions",
                         title: "",
                         onRenderCell: (el, column, item: IListItem) => {
+                            let buttons: Components.IButtonProps[] = [];
+
                             // See if this request hasn't been processed
                             if (item.Status == "New") {
                                 // See if this is the creator of the item or an admin
                                 if (this.isOwner(item)) {
-                                    // Render the action buttons
-                                    Components.ButtonGroup({
-                                        el,
-                                        isSmall: true,
-                                        buttons: [
-                                            {
-                                                text: "Delete",
-                                                type: Components.ButtonTypes.OutlineDanger,
-                                                onClick: () => {
-                                                    // Show delete dialog
-                                                    this.showDeleteDialog(item);
-                                                }
-                                            }
-                                        ]
+                                    // Render the delete button
+                                    buttons.push({
+                                        text: "Delete",
+                                        type: Components.ButtonTypes.OutlineDanger,
+                                        onClick: () => {
+                                            // Show delete dialog
+                                            this.showDeleteDialog(item);
+                                        }
                                     });
                                 }
                             }
+
+                            // See if the request errored and the azure function is enabled
+                            if (item.Status == "Error" && DataSource.AzureFunctionEnabled) {
+                                // Render the retry button
+                                buttons.push({
+                                    text: "Retry",
+                                    type: Components.ButtonTypes.OutlinePrimary,
+                                    onClick: () => {
+                                        // Process the request
+                                        this.processRequest(item.Id);
+                                    }
+                                });
+                            }
+
+                            // Render the buttons
+                            Components.ButtonGroup({
+                                el,
+                                isSmall: true,
+                                buttons
+                            });
                         }
                     }
                 ]
@@ -316,11 +375,17 @@ export class App {
                 return isValid;
             },
             onUpdate: (item: IListItem) => {
-                // Refresh the data
-                DataSource.refresh(item.Id).then(() => {
-                    // Refresh the table
-                    this._dashboard.refresh(DataSource.ListItems);
-                });
+                // See if the azure function is enabled
+                if (DataSource.AzureFunctionEnabled) {
+                    // Process the request
+                    this.processRequest(item.Id);
+                } else {
+                    // Refresh the data
+                    DataSource.refresh(item.Id).then(() => {
+                        // Refresh the table
+                        this._dashboard.refresh(DataSource.ListItems);
+                    });
+                }
             }
         });
     }
