@@ -51,7 +51,7 @@ export class App {
                     items: DataSource.StatusFilters,
                     onFilter: (value: string) => {
                         // Filter the table
-                        this._dashboard.filter(2, value);
+                        this._dashboard.filter(3, value);
                     }
                 }]
             },

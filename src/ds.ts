@@ -1,5 +1,5 @@
 import { List } from "dattatable";
-import { Components, Types } from "gd-sprest-bs";
+import { Components, ContextInfo, Types } from "gd-sprest-bs";
 import { Security } from "./security";
 import Strings from "./strings";
 
@@ -59,10 +59,18 @@ export class DataSource {
     private static loadList(): PromiseLike<void> {
         // Return a promise
         return new Promise((resolve, reject) => {
+            // See if this is not an admin
+            let Filter = null;
+            if (!Security.IsAdmin) {
+                // Set the filter
+                Filter = "Owners/Id eq " + ContextInfo.userId + " or AuthorId eq " + ContextInfo.userId;
+            }
+
             // Initialize the list
             this._list = new List<IListItem>({
                 listName: Strings.Lists.Main,
                 itemQuery: {
+                    Filter,
                     Expand: ["Owners"],
                     OrderBy: ["Title"],
                     GetAllItems: true,
