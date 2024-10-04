@@ -31,7 +31,7 @@ export const Configuration = Helper.SPConfig({
                 {
                     ViewName: "All Items",
                     ViewFields: [
-                        "Id", "LinkTitle", "Created", "Status"
+                        "ID", "LinkTitle", "Created", "Status"
                     ]
                 }
             ]
