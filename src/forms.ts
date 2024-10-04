@@ -140,8 +140,16 @@ export class Forms {
                 return isValid;
             },
             onUpdate: (item: IListItem) => {
+                // Show a loading dialog
+                LoadingDialog.setHeader("Refreshing Requests");
+                LoadingDialog.setBody("Refreshing the data...");
+                LoadingDialog.show();
+
                 // Refresh the data
                 DataSource.refresh(item.Id).then(() => {
+                    // Hide the dialog
+                    LoadingDialog.hide();
+
                     // See if the azure function is enabled
                     if (DataSource.AzureFunctionEnabled) {
                         // Process the request
@@ -173,6 +181,9 @@ export class Forms {
                 (msg) => {
                     // Refresh the item
                     DataSource.refresh(itemId).then(() => {
+                        // Hide the loading dialog
+                        LoadingDialog.hide();
+
                         // Resolve the request
                         resolve();
                     });

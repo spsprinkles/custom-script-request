@@ -114,7 +114,7 @@ export class App {
                             if (Security.IsAdmin) {
                                 // Display the author
                                 el.innerHTML = `
-                                    <span>${item["Author"]}</span>
+                                    <span>${item.Author.Title}</span>
                                     <br/>
                                 `;
                             }
