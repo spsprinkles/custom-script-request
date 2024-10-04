@@ -51,7 +51,7 @@ export class App {
                     let brand = document.createElement("div");
                     brand.className = "d-flex align-items-center";
                     brand.appendChild(CustomIcons(CustomIconTypes.sharePoint, 44, 44));
-                    brand.append("Custom Script");
+                    brand.append("Custom Script App");
                     props.brand = brand;
                 },
                 items: [
