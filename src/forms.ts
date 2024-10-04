@@ -54,6 +54,17 @@ export class Forms {
     static newForm(onUpdate: () => void) {
         // Show the new form
         DataSource.List.newForm({
+            onSetHeader: el => {
+                // Set the header
+                el.firstElementChild.innerHTML = "Create Request";
+            },
+            onFormButtonsRendering: buttons => {
+                // Modify the create button's text
+                buttons[0].text = "Submit";
+
+                // Return the buttons
+                return buttons;
+            },
             onCreateEditForm: props => {
                 props.onControlRendering = (ctrl, fld) => {
                     // See if this is the owners field

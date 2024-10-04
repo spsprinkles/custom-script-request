@@ -12,6 +12,7 @@ export const Configuration = Helper.SPConfig({
                 BaseTemplate: SPTypes.ListTemplateType.GenericList
             },
             TitleFieldDisplayName: "Site Url",
+            TitleFieldDescription: "Enter the relative/absolute url to the site collection you want to enable custom scripts on.",
             CustomFields: [
                 {
                     name: "Status",
