@@ -103,7 +103,7 @@ export class App {
                 rows: DataSource.ListItems,
                 onRendering: dtProps => {
                     // Default order
-                    dtProps.order = [[0, "desc"]];
+                    dtProps.order = [[0, "asc"]];
 
                     // Return the properties
                     return dtProps;

@@ -23,15 +23,15 @@ const GlobalVariable = {
             Configuration.setWebUrl(ContextInfo.webServerRelativeUrl);
         }
 
-        // Initialize the application
-        DataSource.init(azureFunctionUrl).then(
+        // Initialize the application and load the theme
+        Promise.all([
+            ThemeManager.load(true),
+            DataSource.init(azureFunctionUrl)
+        ]).then(
             // Success
             () => {
-                // Load the current theme and apply it to the components
-                ThemeManager.load(true).then(() => {
-                    // Create the application
-                    new App(el);
-                });
+                // Create the application
+                new App(el);
             },
 
             // Error
