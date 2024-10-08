@@ -90,12 +90,29 @@ export class Forms {
                         LoadingDialog.show();
 
                         // Get the site information
-                        Web(values["Title"]).execute(
+                        let webUrl = values["Title"];
+                        Web(webUrl).query({ Expand: ["ParentWeb"] }).execute(
                             web => {
+                                // See if this is a sub-web
+                                if (web.ParentWeb && web.ParentWeb.Id) {
+                                    // Site doesn't exist
+                                    ctrlSiteUrl.updateValidation(ctrlSiteUrl.el, {
+                                        isValid: false,
+                                        invalidMessage: "Detected a sub-web. Please enter the root web url."
+                                    });
+
+                                    // Hide the loading dialog
+                                    LoadingDialog.hide();
+
+                                    // Resolve the request
+                                    resolve(false);
+                                    return;
+                                }
+
                                 // Web exists, update the site url to be absolute
                                 values["Title"] = web.Url;
 
-                                web.SiteUsers().getByEmail(ContextInfo.userEmail).execute(user => {
+                                Web(web.Url).SiteUsers().getByEmail(ContextInfo.userEmail).execute(user => {
                                     // Ensure this is an SCA
                                     if (user.IsSiteAdmin) {
                                         // Hide the dialog
@@ -158,19 +175,25 @@ export class Forms {
 
                 // Refresh the data
                 DataSource.refresh(item.Id).then(() => {
-                    // Hide the dialog
-                    LoadingDialog.hide();
-
                     // See if the azure function is enabled
                     if (DataSource.AzureFunctionEnabled) {
+                        // Update the loading dialog
+                        LoadingDialog.setBody("Processing the request...");
+
                         // Process the request
                         this.processRequest(item.Id).then(() => {
                             // Call the update event
                             onUpdate();
+
+                            // Hide the dialog
+                            LoadingDialog.hide();
                         });
                     } else {
                         // Call the update event
                         onUpdate();
+
+                        // Hide the dialog
+                        LoadingDialog.hide();
                     }
                 });
             }
