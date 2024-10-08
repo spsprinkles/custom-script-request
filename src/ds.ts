@@ -132,12 +132,13 @@ export class DataSource {
         this._azureFunctionUrl = azureFunctionUrl;
 
         // Return a promise
-        return Promise.all([
+        return new Promise((resolve, reject) => {
             // Init the security
-            Security.init(),
-            // Load the list
-            this.loadList()
-        ]);
+            Security.init().then(() => {
+                // Load the list
+                this.loadList().then(resolve, reject);
+            }, reject);
+        });
     }
 
     // Refreshes the list data
