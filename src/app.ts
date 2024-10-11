@@ -168,7 +168,7 @@ export class App {
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
                                         // Process the request
-                                        Forms.processRequest(item.Id).then(() => {
+                                        Forms.processRequest(item.Title, item.Id).then(() => {
                                             // Refresh the table
                                             this._dashboard.refresh(DataSource.ListItems);
                                         });
