@@ -1,5 +1,6 @@
 import { Dashboard } from "dattatable";
-import { Components, ContextInfo, CustomIcons, CustomIconTypes } from "gd-sprest-bs";
+import { Components, ContextInfo } from "gd-sprest-bs";
+import { hourglassTop } from "gd-sprest-bs/build/icons/svgs/hourglassTop";
 import * as moment from "moment";
 import { DataSource, IListItem } from "./ds";
 import { Forms } from "./forms";
@@ -50,7 +51,7 @@ export class App {
                     // Set the brand
                     let brand = document.createElement("div");
                     brand.className = "d-flex align-items-center";
-                    brand.appendChild(CustomIcons(CustomIconTypes.sharePoint, 44, 44));
+                    brand.appendChild(hourglassTop(44, 44));
                     brand.append("Custom Script App");
                     props.brand = brand;
                 },
