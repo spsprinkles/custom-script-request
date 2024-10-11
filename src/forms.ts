@@ -97,9 +97,6 @@ export class Forms {
                                 // Web exists, update the site url to be absolute
                                 values["Title"] = web.Url;
 
-                                // Hide the loading dialog
-                                LoadingDialog.hide();
-
                                 // Resolve the request
                                 resolve(true);
                             },
@@ -138,9 +135,9 @@ export class Forms {
                         LoadingDialog.setBody("Processing the request...");
 
                         // Process the request
-                        this.processRequest(item.Title, item.Id).then(() => {
+                        this.processRequest(item.Title, item.Id).then((updateFl) => {
                             // Call the update event
-                            onUpdate();
+                            updateFl ? onUpdate() : null;
 
                             // Hide the dialog
                             LoadingDialog.hide();
@@ -158,7 +155,7 @@ export class Forms {
     }
 
     // Method to process a request
-    static processRequest(webUrl: string, itemId: number): PromiseLike<void> {
+    static processRequest(webUrl: string, itemId: number): PromiseLike<boolean> {
         // Return a promise
         return new Promise((resolve) => {
             // Show a loading dialog
@@ -184,7 +181,7 @@ export class Forms {
                                 LoadingDialog.hide();
 
                                 // Resolve the request
-                                resolve();
+                                resolve(true);
                             });
 
                             // Clear the modal
@@ -218,7 +215,7 @@ export class Forms {
                             LoadingDialog.hide();
 
                             // Resolve the request
-                            resolve();
+                            resolve(false);
                         }
                     );
                 },
@@ -240,7 +237,7 @@ export class Forms {
                     LoadingDialog.hide();
 
                     // Resolve the request
-                    resolve();
+                    resolve(false);
                 }
             );
         });
