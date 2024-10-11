@@ -1,5 +1,5 @@
 import { List } from "dattatable";
-import { Components, ContextInfo, Types } from "gd-sprest-bs";
+import { Components, ContextInfo, Types, Web } from "gd-sprest-bs";
 import { Security } from "./security";
 import Strings from "./strings";
 
@@ -153,6 +153,48 @@ export class DataSource {
                 // Refresh the data
                 DataSource.List.refresh().then(resolve, reject);
             }
+        });
+    }
+
+    // Validates that the user is an SCA of the site
+    static validate(webUrl: string): PromiseLike<Types.SP.WebOData> {
+        // Return a promise
+        return new Promise((resolve, reject) => {
+            // Query the web
+            Web(webUrl).query({ Expand: ["ParentWeb"] }).execute(
+                web => {
+                    // See if this is a sub-web
+                    if (web.ParentWeb && web.ParentWeb.Id) {
+                        // Not the root web
+                        reject("Detected a sub-web. Please enter the root web url.");
+                        return;
+                    }
+
+                    Web(web.Url).SiteUsers().getByEmail(ContextInfo.userEmail).execute(user => {
+                        // Ensure this is an SCA
+                        if (user.IsSiteAdmin) {
+                            // Resolve the request
+                            resolve(web);
+                        } else {
+                            // Not the SCA of the site
+                            reject("Site exists, but you are not the administrator. Please have the site administrator submit the request.");
+                        }
+                    })
+                },
+
+                (ex) => {
+                    // See if it's a permission issue
+                    if (ex.status == 403) {
+                        // User doesn't have access to site
+                        reject("Error the site exists, but you do not have permissions to it.");
+                    }
+                    // Else, the site doesn't exist
+                    else {
+                        // Site doesn't exist
+                        reject("Error the site doesn't exist. Please check the url and try again.");
+                    }
+                }
+            );
         });
     }
 }

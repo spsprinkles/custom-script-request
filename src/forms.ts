@@ -89,70 +89,27 @@ export class Forms {
                         LoadingDialog.setBody("Validating the site url...");
                         LoadingDialog.show();
 
-                        // Get the site information
+                        // Validate the site and permissions
                         let webUrl = values["Title"];
-                        Web(webUrl).query({ Expand: ["ParentWeb"] }).execute(
+                        DataSource.validate(webUrl).then(
+                            // Success
                             web => {
-                                // See if this is a sub-web
-                                if (web.ParentWeb && web.ParentWeb.Id) {
-                                    // Site doesn't exist
-                                    ctrlSiteUrl.updateValidation(ctrlSiteUrl.el, {
-                                        isValid: false,
-                                        invalidMessage: "Detected a sub-web. Please enter the root web url."
-                                    });
-
-                                    // Hide the loading dialog
-                                    LoadingDialog.hide();
-
-                                    // Resolve the request
-                                    resolve(false);
-                                    return;
-                                }
-
                                 // Web exists, update the site url to be absolute
                                 values["Title"] = web.Url;
 
-                                Web(web.Url).SiteUsers().getByEmail(ContextInfo.userEmail).execute(user => {
-                                    // Ensure this is an SCA
-                                    if (user.IsSiteAdmin) {
-                                        // Hide the dialog
-                                        LoadingDialog.hide();
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
 
-                                        // Resolve the request
-                                        resolve(true);
-                                    } else {
-                                        // Site doesn't exist
-                                        ctrlSiteUrl.updateValidation(ctrlSiteUrl.el, {
-                                            isValid: false,
-                                            invalidMessage: "Site exists, but you are not the administrator. Please have the site administrator submit the request."
-                                        });
-
-                                        // Hide the loading dialog
-                                        LoadingDialog.hide();
-
-                                        // Resolve the request
-                                        resolve(false);
-                                    }
-                                })
+                                // Resolve the request
+                                resolve(true);
                             },
 
-                            (ex) => {
-                                // See if it's a permission issue
-                                if (ex.status == 403) {
-                                    // User doesn't have access to site
-                                    ctrlSiteUrl.updateValidation(ctrlSiteUrl.el, {
-                                        isValid: false,
-                                        invalidMessage: "Error the site exists, but you do not have permissions to it."
-                                    });
-                                }
-                                // Else, the site doesn't exist
-                                else {
-                                    // Site doesn't exist
-                                    ctrlSiteUrl.updateValidation(ctrlSiteUrl.el, {
-                                        isValid: false,
-                                        invalidMessage: "Error the site doesn't exist. Please check the url and try again."
-                                    });
-                                }
+                            errorMsg => {
+                                // Update the validation
+                                ctrlSiteUrl.updateValidation(ctrlSiteUrl.el, {
+                                    isValid: false,
+                                    invalidMessage: errorMsg
+                                });
 
                                 // Hide the loading dialog
                                 LoadingDialog.hide();
@@ -181,7 +138,7 @@ export class Forms {
                         LoadingDialog.setBody("Processing the request...");
 
                         // Process the request
-                        this.processRequest(item.Id).then(() => {
+                        this.processRequest(item.Title, item.Id).then(() => {
                             // Call the update event
                             onUpdate();
 
@@ -201,42 +158,72 @@ export class Forms {
     }
 
     // Method to process a request
-    static processRequest(itemId: number): PromiseLike<void> {
+    static processRequest(webUrl: string, itemId: number): PromiseLike<void> {
         // Return a promise
         return new Promise((resolve) => {
             // Show a loading dialog
-            LoadingDialog.setHeader("Processing Request");
-            LoadingDialog.setBody("The request is being processed...");
+            LoadingDialog.setHeader("Validating Site");
+            LoadingDialog.setBody("The site and permissions are being validated...");
             LoadingDialog.show();
 
-            // Process the request
-            DataSource.processRequest(itemId).then(
+            // Validate the web and permissions
+            DataSource.validate(webUrl).then(
                 // Success
-                (msg) => {
-                    // Refresh the item
-                    DataSource.refresh(itemId).then(() => {
-                        // Hide the loading dialog
-                        LoadingDialog.hide();
+                web => {
+                    // Show a loading dialog
+                    LoadingDialog.setHeader("Processing Request");
+                    LoadingDialog.setBody("The request is being processed...");
 
-                        // Resolve the request
-                        resolve();
-                    });
+                    // Process the request
+                    DataSource.processRequest(itemId).then(
+                        // Success
+                        (response) => {
+                            // Refresh the item
+                            DataSource.refresh(itemId).then(() => {
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
 
-                    // Clear the modal
-                    Modal.clear();
+                                // Resolve the request
+                                resolve();
+                            });
 
-                    // Set the header
-                    Modal.setHeader("Request Processed");
+                            // Clear the modal
+                            Modal.clear();
 
-                    // Set the body
-                    Modal.setBody(msg);
+                            // Set the header
+                            Modal.setHeader("Request Processed");
 
-                    // Show the modal
-                    Modal.show();
+                            // Set the body
+                            Modal.setBody(response);
+
+                            // Show the modal
+                            Modal.show();
+                        },
+
+                        // Error
+                        errorMsg => {
+                            // Clear the modal
+                            Modal.clear();
+
+                            // Set the header
+                            Modal.setHeader("Error Processing Request");
+
+                            // Set the body
+                            Modal.setBody(errorMsg);
+
+                            // Show the modal
+                            Modal.show();
+
+                            // Hide the loading dialog
+                            LoadingDialog.hide();
+
+                            // Resolve the request
+                            resolve();
+                        }
+                    );
                 },
 
-                // Error
-                msg => {
+                errorMsg => {
                     // Clear the modal
                     Modal.clear();
 
@@ -244,7 +231,7 @@ export class Forms {
                     Modal.setHeader("Error Processing Request");
 
                     // Set the body
-                    Modal.setBody(msg);
+                    Modal.setBody(errorMsg);
 
                     // Show the modal
                     Modal.show();
