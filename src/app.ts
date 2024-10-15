@@ -114,9 +114,10 @@ export class App {
                         name: "Created",
                         title: "Request Date",
                         onRenderCell: (el, column, item: IListItem) => {
-                            // Set the filter to only look at the time
-                            let filterValue = moment(item["Created"]).format("llll");
-                            el.setAttribute("data-filter", filterValue);
+                            // Set the sort/filter value
+                            let createdDate = moment(item["Created"]);
+                            el.setAttribute("data-filter", createdDate.format("llll"));
+                            el.setAttribute("data-sort", createdDate.utc().format());
 
                             // See if this is the admin
                             if (Security.IsAdmin) {
@@ -129,7 +130,7 @@ export class App {
 
                             // Use moment to set the date/time
                             el.innerHTML += `
-                                <span>${filterValue}</span>
+                                <span>${createdDate.format("llll")}</span>
                             `;
                         }
                     },
