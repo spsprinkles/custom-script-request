@@ -26,7 +26,7 @@ export class App {
     // Returns true/false if the user is an owner of the item
     private isOwner(item: IListItem) {
         // See if they created the request
-        return item.AuthorId == ContextInfo.userId;
+        return item.AuthorId == ContextInfo.userId || Security.IsAdmin;
     }
 
     // Renders the dashboard
