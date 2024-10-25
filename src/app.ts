@@ -116,7 +116,8 @@ export class App {
                         onRenderCell: (el, column, item: IListItem) => {
                             // Set the sort/filter value
                             let createdDate = moment(item["Created"]);
-                            el.setAttribute("data-filter", createdDate.format("llll"));
+                            let localDate = createdDate.local().format("llll");
+                            el.setAttribute("data-filter", localDate);
                             el.setAttribute("data-sort", createdDate.utc().format());
 
                             // See if this is the admin
@@ -130,7 +131,7 @@ export class App {
 
                             // Use moment to set the date/time
                             el.innerHTML += `
-                                <span>${createdDate.format("llll")}</span>
+                                <span>${localDate}</span>
                             `;
                         }
                     },
@@ -163,18 +164,21 @@ export class App {
                                     }
                                 });
 
-                                // Render the retry button
-                                buttons.push({
-                                    text: "Retry",
-                                    type: Components.ButtonTypes.OutlinePrimary,
-                                    onClick: () => {
-                                        // Process the request
-                                        Forms.processRequest(item.Title, item.Id).then((updateFl) => {
-                                            // Refresh the table
-                                            updateFl ? this._dashboard.refresh(DataSource.ListItems) : null;
-                                        });
-                                    }
-                                });
+                                // See if the api exists
+                                if (DataSource.AzureFunctionEnabled) {
+                                    // Render the retry button
+                                    buttons.push({
+                                        text: "Retry",
+                                        type: Components.ButtonTypes.OutlinePrimary,
+                                        onClick: () => {
+                                            // Process the request
+                                            Forms.processRequest(item.Title, item.Id).then((updateFl) => {
+                                                // Refresh the table
+                                                updateFl ? this._dashboard.refresh(DataSource.ListItems) : null;
+                                            });
+                                        }
+                                    });
+                                }
                             }
 
                             // Render the buttons
